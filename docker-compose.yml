@@ -1,0 +1,15 @@
+name: booking-order-app
+services:
+  user-service:
+    container_name: user-service
+    platform: linux/amd64
+    # ini buat di server nanti
+    # image: ranggad/user-service:1
+    # lokal
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8001"
+    env_file:
+      - .env
