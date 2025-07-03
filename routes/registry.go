@@ -1,9 +1,9 @@
 package routes
 
 import (
+	"field-service/controllers"
+	routes "field-service/routes/user"
 	"github.com/gin-gonic/gin"
-	"user-service/controllers"
-	routes "user-service/routes/user"
 )
 
 type Registry struct {

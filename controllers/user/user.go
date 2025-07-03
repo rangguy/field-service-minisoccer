@@ -1,13 +1,13 @@
 package controllers
 
 import (
+	errWrap "field-service/common/error"
+	"field-service/common/response"
+	"field-service/domain/dto"
+	"field-service/services"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"net/http"
-	errWrap "user-service/common/error"
-	"user-service/common/response"
-	"user-service/domain/dto"
-	"user-service/services"
 )
 
 type UserController struct {

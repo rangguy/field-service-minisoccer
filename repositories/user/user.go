@@ -3,12 +3,12 @@ package repositories
 import (
 	"context"
 	"errors"
+	errWrap "field-service/common/error"
+	errConstant "field-service/constants/error"
+	"field-service/domain/dto"
+	"field-service/domain/models"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
-	errWrap "user-service/common/error"
-	errConstant "user-service/constants/error"
-	"user-service/domain/dto"
-	"user-service/domain/models"
 )
 
 type UserRepository struct {

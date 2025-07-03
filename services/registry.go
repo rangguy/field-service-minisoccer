@@ -1,8 +1,8 @@
 package services
 
 import (
-	"user-service/repositories"
-	services "user-service/services/user"
+	"field-service/repositories"
+	services "field-service/services/user"
 )
 
 type Registry struct {

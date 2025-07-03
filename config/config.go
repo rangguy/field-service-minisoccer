@@ -1,10 +1,10 @@
 package config
 
 import (
+	"field-service/common/util"
 	"github.com/sirupsen/logrus"
 	_ "github.com/spf13/viper/remote"
 	"os"
-	"user-service/common/util"
 )
 
 var Config AppConfig

@@ -2,16 +2,16 @@ package services
 
 import (
 	"context"
+	"field-service/config"
+	"field-service/constants"
+	errConstant "field-service/constants/error"
+	"field-service/domain/dto"
+	"field-service/domain/models"
+	"field-service/repositories"
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 	"strings"
 	"time"
-	"user-service/config"
-	"user-service/constants"
-	errConstant "user-service/constants/error"
-	"user-service/domain/dto"
-	"user-service/domain/models"
-	"user-service/repositories"
 )
 
 type UserService struct {

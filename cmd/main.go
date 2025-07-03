@@ -1,6 +1,15 @@
 package cmd
 
 import (
+	"field-service/common/response"
+	"field-service/config"
+	"field-service/constants"
+	"field-service/controllers"
+	"field-service/domain/models"
+	"field-service/middlewares"
+	"field-service/repositories"
+	"field-service/routes"
+	"field-service/services"
 	"fmt"
 	"github.com/didip/tollbooth"
 	"github.com/didip/tollbooth/limiter"
@@ -9,16 +18,6 @@ import (
 	"github.com/spf13/cobra"
 	"net/http"
 	"time"
-	"user-service/common/response"
-	"user-service/config"
-	"user-service/constants"
-	"user-service/controllers"
-	"user-service/database/seeders"
-	"user-service/domain/models"
-	"user-service/middlewares"
-	"user-service/repositories"
-	"user-service/routes"
-	"user-service/services"
 )
 
 var command = &cobra.Command{
@@ -45,7 +44,6 @@ var command = &cobra.Command{
 		if err != nil {
 			panic(err)
 		}
-		seeders.NewSeederRegistry(db).Run()
 		repository := repositories.NewRepositoryRegistry(db)
 		service := services.NewServiceRegistry(repository)
 		controller := controllers.NewControllerRegistry(service)

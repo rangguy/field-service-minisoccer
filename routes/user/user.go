@@ -1,9 +1,9 @@
 package routes
 
 import (
+	"field-service/controllers"
+	"field-service/middlewares"
 	"github.com/gin-gonic/gin"
-	"user-service/controllers"
-	"user-service/middlewares"
 )
 
 type UserRoute struct {

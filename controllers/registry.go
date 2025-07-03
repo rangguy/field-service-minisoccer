@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	controllers "user-service/controllers/user"
-	"user-service/services"
+	controllers "field-service/controllers/user"
+	"field-service/services"
 )
 
 type Registry struct {

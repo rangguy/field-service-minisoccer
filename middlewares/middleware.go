@@ -4,6 +4,11 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
+	"field-service/common/response"
+	"field-service/config"
+	"field-service/constants"
+	errConstant "field-service/constants/error"
+	services "field-service/services/user"
 	"fmt"
 	"github.com/didip/tollbooth"
 	"github.com/didip/tollbooth/limiter"
@@ -12,11 +17,6 @@ import (
 	"github.com/sirupsen/logrus"
 	"net/http"
 	"strings"
-	"user-service/common/response"
-	"user-service/config"
-	"user-service/constants"
-	errConstant "user-service/constants/error"
-	services "user-service/services/user"
 )
 
 func HandlePanic() gin.HandlerFunc {

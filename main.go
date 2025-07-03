@@ -1,6 +1,6 @@
 package main
 
-import "user-service/cmd"
+import "field-service/cmd"
 
 func main() {
 	cmd.Run()
