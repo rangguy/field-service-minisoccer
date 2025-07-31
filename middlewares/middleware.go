@@ -1,19 +1,17 @@
 package middlewares
 
 import (
-	"context"
 	"crypto/sha256"
 	"encoding/hex"
+	"field-service/clients"
 	"field-service/common/response"
 	"field-service/config"
 	"field-service/constants"
 	errConstant "field-service/constants/error"
-	services "field-service/services/user"
 	"fmt"
 	"github.com/didip/tollbooth"
 	"github.com/didip/tollbooth/limiter"
 	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt/v5"
 	"github.com/sirupsen/logrus"
 	"net/http"
 	"strings"
@@ -82,35 +80,30 @@ func validateAPIKey(c *gin.Context) error {
 	return nil
 }
 
-func validateBearerToken(c *gin.Context, token string) error {
-	if !strings.Contains(token, "Bearer") {
-		return errConstant.ErrUnauthorized
+func contains(roles []string, role string) bool {
+	for _, r := range roles {
+		if r == role {
+			return true
+		}
 	}
 
-	tokenString := extractBearerToken(token)
-	if tokenString == "" {
-		return errConstant.ErrUnauthorized
-	}
+	return false
+}
 
-	claims := &services.Claims{}
-	tokenJwt, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
-		_, ok := token.Method.(*jwt.SigningMethodHMAC)
-		if !ok {
-			return nil, errConstant.ErrInvalidToken
+func CheckRole(roles []string, client clients.IClientRegistry) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		user, err := client.GetUser().GetUserByToken(c)
+		if err != nil {
+			responseUnauthorized(c, errConstant.ErrUnauthorized.Error())
+			return
 		}
 
-		jwtSecret := []byte(config.Config.JwtSecretKey)
-		return jwtSecret, nil
-	})
-
-	if err != nil || !tokenJwt.Valid {
-		return errConstant.ErrUnauthorized
+		if !contains(roles, user.Role) {
+			responseUnauthorized(c, errConstant.ErrUnauthorized.Error())
+			return
+		}
+		c.Next()
 	}
-
-	userLogin := c.Request.WithContext(context.WithValue(c.Request.Context(), constants.UserLogin, claims.User))
-	c.Request = userLogin
-	c.Set(constants.Token, token)
-	return nil
 }
 
 func Authenticate() gin.HandlerFunc {
@@ -122,13 +115,19 @@ func Authenticate() gin.HandlerFunc {
 			return
 		}
 
-		err = validateBearerToken(c, token)
+		err = validateAPIKey(c)
 		if err != nil {
 			responseUnauthorized(c, err.Error())
 			return
 		}
 
-		err = validateAPIKey(c)
+		c.Next()
+	}
+}
+
+func AuthenticateWithoutToken() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		err := validateAPIKey(c)
 		if err != nil {
 			responseUnauthorized(c, err.Error())
 			return
