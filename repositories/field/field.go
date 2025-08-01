@@ -9,6 +9,7 @@ import (
 	"field-service/domain/dto"
 	"field-service/domain/models"
 	"fmt"
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -69,7 +70,7 @@ func (f *FieldRepository) FindAllWithPagination(ctx context.Context, param *dto.
 	return fields, total, nil
 }
 
-func (f FieldRepository) FindAllWithOutPagination(ctx context.Context) ([]models.Field, error) {
+func (f *FieldRepository) FindAllWithOutPagination(ctx context.Context) ([]models.Field, error) {
 	var fields []models.Field
 	err := f.db.
 		WithContext(ctx).
@@ -82,7 +83,7 @@ func (f FieldRepository) FindAllWithOutPagination(ctx context.Context) ([]models
 	return fields, nil
 }
 
-func (f FieldRepository) FindByUUID(ctx context.Context, uuid string) (*models.Field, error) {
+func (f *FieldRepository) FindByUUID(ctx context.Context, uuid string) (*models.Field, error) {
 	var field models.Field
 	err := f.db.
 		WithContext(ctx).
@@ -100,17 +101,44 @@ func (f FieldRepository) FindByUUID(ctx context.Context, uuid string) (*models.F
 	return &field, nil
 }
 
-func (f FieldRepository) Create(ctx context.Context, field *models.Field) (*models.Field, error) {
-	//TODO implement me
-	panic("implement me")
+func (f *FieldRepository) Create(ctx context.Context, req *models.Field) (*models.Field, error) {
+	field := models.Field{
+		UUID:         uuid.New(),
+		Code:         req.Code,
+		Name:         req.Name,
+		Images:       req.Images,
+		PricePerHour: req.PricePerHour,
+	}
+
+	err := f.db.WithContext(ctx).Create(&field).Error
+	if err != nil {
+		return nil, errWrap.WrapError(errConstant.ErrSQLError)
+	}
+
+	return &field, nil
 }
 
-func (f FieldRepository) Update(ctx context.Context, s string, field *models.Field) (*models.Field, error) {
-	//TODO implement me
-	panic("implement me")
+func (f *FieldRepository) Update(ctx context.Context, uuid string, req *models.Field) (*models.Field, error) {
+	field := models.Field{
+		Code:         req.Code,
+		Name:         req.Name,
+		Images:       req.Images,
+		PricePerHour: req.PricePerHour,
+	}
+
+	err := f.db.WithContext(ctx).Where("uuid = ?", uuid).Updates(&field).Error
+	if err != nil {
+		return nil, errWrap.WrapError(errConstant.ErrSQLError)
+	}
+
+	return &field, nil
 }
 
-func (f FieldRepository) Delete(ctx context.Context, s string) error {
-	//TODO implement me
-	panic("implement me")
+func (f *FieldRepository) Delete(ctx context.Context, uuid string) error {
+	err := f.db.WithContext(ctx).Where("uuid = ?", uuid).Delete(&models.Field{}).Error
+	if err != nil {
+		return errWrap.WrapError(errConstant.ErrSQLError)
+	}
+
+	return nil
 }
