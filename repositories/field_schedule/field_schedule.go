@@ -10,7 +10,6 @@ import (
 	"field-service/domain/dto"
 	"field-service/domain/models"
 	"fmt"
-	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -114,7 +113,7 @@ func (f *FieldScheduleRepository) FindByUUID(ctx context.Context, uuid string) (
 	return &fieldSchedule, nil
 }
 
-func (f *FieldScheduleRepository) FindByDateAndTimeID(ctx context.Context, date string, timeID string, FieldID string) (*models.FieldSchedule, error) {
+func (f *FieldScheduleRepository) FindByDateAndTimeID(ctx context.Context, date string, timeID int, FieldID int) (*models.FieldSchedule, error) {
 	var fieldSchedule models.FieldSchedule
 	err := f.db.
 		WithContext(ctx).
@@ -144,19 +143,38 @@ func (f *FieldScheduleRepository) Create(ctx context.Context, req []models.Field
 }
 
 func (f *FieldScheduleRepository) Update(ctx context.Context, uuid string, req *models.FieldSchedule) (*models.FieldSchedule, error) {
-	field := models.FieldSchedule{
-		Code:         req.Code,
-		Name:         req.Name,
-		Images:       req.Images,
-		PricePerHour: req.PricePerHour,
+	// nyari fieldschedule berdasarkan uuid terlebih dahulu
+	fieldSchedule, err := f.FindByUUID(ctx, uuid)
+	if err != nil {
+		return nil, err
 	}
 
-	err := f.db.WithContext(ctx).Where("uuid = ?", uuid).Updates(&field).Error
+	// cuman bisa update tanggal field schedule aja
+	fieldSchedule.Date = req.Date
+
+	err = f.db.WithContext(ctx).Save(&fieldSchedule).Error
 	if err != nil {
 		return nil, errWrap.WrapError(errConstant.ErrSQLError)
 	}
 
-	return &field, nil
+	return fieldSchedule, nil
+}
+
+func (f *FieldScheduleRepository) UpdateStatus(ctx context.Context, status constants.FieldScheduleStatus, uuid string) error {
+	fieldSchedule, err := f.FindByUUID(ctx, uuid)
+	if err != nil {
+		return err
+	}
+
+	// update status dari field schedule
+	fieldSchedule.Status = status
+
+	err = f.db.WithContext(ctx).Save(&fieldSchedule).Error
+	if err != nil {
+		return errWrap.WrapError(errConstant.ErrSQLError)
+	}
+
+	return nil
 }
 
 func (f *FieldScheduleRepository) Delete(ctx context.Context, uuid string) error {
