@@ -32,7 +32,7 @@ type PaginationResult struct {
 	Data         interface{} `json:"data"`
 }
 
-func GeneratePagination(params PaginationParam) *PaginationResult {
+func GeneratePagination(params PaginationParam) PaginationResult {
 	totalPage := int(math.Ceil(float64(params.Count) / float64(params.Limit)))
 
 	var (
@@ -48,7 +48,7 @@ func GeneratePagination(params PaginationParam) *PaginationResult {
 		nextPage = params.Page - 1
 	}
 
-	result := &PaginationResult{
+	result := PaginationResult{
 		TotalPage:    totalPage,
 		TotalData:    params.Count,
 		NextPage:     &nextPage,
