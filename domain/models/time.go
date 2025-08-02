@@ -7,7 +7,7 @@ import (
 )
 
 type Time struct {
-	ID        int       `gorm:"primaryKey;autoIncrement"`
+	ID        uint      `gorm:"primaryKey;autoIncrement"`
 	UUID      uuid.UUID `gorm:"type:uuid;not null"`
 	StartTime string    `gorm:"type:time without time zone;not null"`
 	EndTime   string    `gorm:"type:time without time zone;not null"`
