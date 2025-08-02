@@ -19,7 +19,7 @@ type FieldRepository struct {
 
 type IFieldRepository interface {
 	FindAllWithPagination(context.Context, *dto.FieldRequestParam) ([]models.Field, int64, error)
-	FindAllWithOutPagination(context.Context) ([]models.Field, error)
+	FindAllWithoutPagination(context.Context) ([]models.Field, error)
 	FindByUUID(context.Context, string) (*models.Field, error)
 	Create(context.Context, *models.Field) (*models.Field, error)
 	Update(context.Context, string, *models.Field) (*models.Field, error)
@@ -70,7 +70,7 @@ func (f *FieldRepository) FindAllWithPagination(ctx context.Context, param *dto.
 	return fields, total, nil
 }
 
-func (f *FieldRepository) FindAllWithOutPagination(ctx context.Context) ([]models.Field, error) {
+func (f *FieldRepository) FindAllWithoutPagination(ctx context.Context) ([]models.Field, error) {
 	var fields []models.Field
 	err := f.db.
 		WithContext(ctx).
