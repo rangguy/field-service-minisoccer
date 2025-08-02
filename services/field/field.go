@@ -6,6 +6,7 @@ import (
 	"field-service/common/util"
 	errConstant "field-service/constants/error"
 	"field-service/domain/dto"
+	"field-service/domain/models"
 	"field-service/repositories"
 	"fmt"
 	"io"
@@ -164,20 +165,87 @@ func (f *FieldService) uploadImage(ctx context.Context, images []multipart.FileH
 		}
 		urls = append(urls, url)
 	}
-	
+
 	return urls, nil
 }
 
 func (f *FieldService) Create(ctx context.Context, request *dto.FieldRequest) (*dto.FieldResponse, error) {
+	imageUrl, err := f.uploadImage(ctx, request.Images)
+	if err != nil {
+		return nil, err
+	}
 
+	field, err := f.repository.GetField().Create(ctx, &models.Field{
+		Code:         request.Code,
+		Name:         request.Name,
+		Images:       imageUrl,
+		PricePerHour: request.PricePerHour,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	response := &dto.FieldResponse{
+		UUID:         field.UUID,
+		Name:         field.Name,
+		PricePerHour: field.PricePerHour,
+		Images:       field.Images,
+		CreatedAt:    field.CreatedAt,
+		UpdatedAt:    field.UpdatedAt,
+	}
+
+	return response, nil
 }
 
 func (f *FieldService) Update(ctx context.Context, uuid string, request *dto.UpdateFieldRequest) (*dto.FieldResponse, error) {
-	//TODO implement me
-	panic("implement me")
+	field, err := f.repository.GetField().FindByUUID(ctx, uuid)
+	if err != nil {
+		return nil, err
+	}
+
+	var imageUrl []string
+	if request.Images != nil {
+		imageUrl, err = f.uploadImage(ctx, request.Images)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		imageUrl = field.Images
+	}
+
+	fieldUpdated, err := f.repository.GetField().Update(ctx, uuid, &models.Field{
+		Code:         request.Code,
+		Name:         request.Name,
+		Images:       imageUrl,
+		PricePerHour: request.PricePerHour,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	response := &dto.FieldResponse{
+		UUID:         fieldUpdated.UUID,
+		Code:         fieldUpdated.Code,
+		Name:         fieldUpdated.Name,
+		PricePerHour: fieldUpdated.PricePerHour,
+		Images:       fieldUpdated.Images,
+		CreatedAt:    fieldUpdated.CreatedAt,
+		UpdatedAt:    fieldUpdated.UpdatedAt,
+	}
+
+	return response, nil
 }
 
-func (f *FieldService) Delete(ctx context.Context, s string) error {
-	//TODO implement me
-	panic("implement me")
+func (f *FieldService) Delete(ctx context.Context, uuid string) error {
+	_, err := f.repository.GetField().FindByUUID(ctx, uuid)
+	if err != nil {
+		return err
+	}
+
+	err = f.repository.GetField().Delete(ctx, uuid)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
