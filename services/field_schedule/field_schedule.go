@@ -137,8 +137,50 @@ func (f *FieldScheduleService) GetByUUID(ctx context.Context, uuid string) (*dto
 }
 
 func (f *FieldScheduleService) GenerateScheduleForOneMonth(ctx context.Context, request *dto.GenerateFieldScheduleForOneMonthRequest) error {
-	//TODO implement me
-	panic("implement me")
+	field, err := f.repository.GetField().FindByUUID(ctx, request.FieldID)
+	if err != nil {
+		return err
+	}
+
+	times, err := f.repository.GetTime().FindAll(ctx)
+	if err != nil {
+		return err
+	}
+
+	numberOfDays := 30
+	fieldSchedules := make([]models.FieldSchedule, 0, numberOfDays)
+	now := time.Now().Add(time.Duration(1) * 24 * time.Hour)
+	for i := 0; i < numberOfDays; i++ {
+		currentDate := now.AddDate(0, 0, i)
+		for _, timeItem := range times {
+			schedule, err := f.repository.GetFieldSchedule().FindByDateAndTimeID(
+				ctx,
+				currentDate.Format(time.DateOnly),
+				int(timeItem.ID),
+				int(field.ID),
+			)
+			if err != nil {
+				return err
+			}
+			if schedule != nil {
+				return errFieldSchedule.ErrFieldScheduleIsExist
+			}
+
+			fieldSchedules = append(fieldSchedules, models.FieldSchedule{
+				UUID:    uuid.New(),
+				FieldID: field.ID,
+				TimeID:  timeItem.ID,
+				Date:    currentDate,
+				Status:  constants.Available,
+			})
+		}
+	}
+	err = f.repository.GetFieldSchedule().Create(ctx, fieldSchedules)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (f *FieldScheduleService) Create(ctx context.Context, request *dto.FieldScheduleRequest) error {
