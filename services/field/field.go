@@ -1,10 +1,20 @@
 package services
 
 import (
+	"bytes"
 	"context"
 	"field-service/common/util"
+	errConstant "field-service/constants/error"
 	"field-service/domain/dto"
 	"field-service/repositories"
+	"fmt"
+	"io"
+	"mime/multipart"
+	"os"
+	"path"
+	"path/filepath"
+	"strings"
+	"time"
 )
 
 type FieldService struct {
@@ -89,13 +99,80 @@ func (f *FieldService) GetByUUID(ctx context.Context, uuid string) (*dto.FieldRe
 
 	return fieldResult, nil
 }
+func (f *FieldService) validateUpload(images []multipart.FileHeader) error {
+	if images == nil || len(images) == 0 {
+		return errConstant.ErrInvalidUploadFile
+	}
 
-func (f *FieldService) Create(ctx context.Context, request *dto.FieldRequest) (*dto.FieldResponse, error) {
-	//TODO implement me
-	panic("implement me")
+	for _, image := range images {
+		if image.Size > 5*1024*1024 {
+			return errConstant.ErrSizeTooBig
+		}
+	}
+
+	return nil
 }
 
-func (f *FieldService) Update(ctx context.Context, s string, request *dto.UpdateFieldRequest) (*dto.FieldResponse, error) {
+func (f *FieldService) processAndUploadImage(ctx context.Context, image multipart.FileHeader) (string, error) {
+	file, err := image.Open()
+	if err != nil {
+		return "", err
+	}
+	defer file.Close()
+
+	// Membaca isi file ke buffer
+	buffer := new(bytes.Buffer)
+	_, err = io.Copy(buffer, file)
+	if err != nil {
+		return "", err
+	}
+
+	// Format nama file
+	timestamp := time.Now().Format("20060102150405")
+	ext := path.Ext(image.Filename)
+	newFilename := fmt.Sprintf("%s-%s%s", timestamp, strings.TrimSuffix(image.Filename, ext), ext)
+
+	// Buat path lengkap di folder "images"
+	outputPath := filepath.Join("images", newFilename)
+
+	// Pastikan folder "images" ada
+	err = os.MkdirAll("images", os.ModePerm)
+	if err != nil {
+		return "", err
+	}
+
+	// Simpan file ke path
+	err = os.WriteFile(outputPath, buffer.Bytes(), 0644)
+	if err != nil {
+		return "", err
+	}
+
+	return outputPath, nil
+}
+
+func (f *FieldService) uploadImage(ctx context.Context, images []multipart.FileHeader) ([]string, error) {
+	err := f.validateUpload(images)
+	if err != nil {
+		return nil, err
+	}
+
+	urls := make([]string, 0, len(images))
+	for _, image := range images {
+		url, err := f.processAndUploadImage(ctx, image)
+		if err != nil {
+			return nil, err
+		}
+		urls = append(urls, url)
+	}
+	
+	return urls, nil
+}
+
+func (f *FieldService) Create(ctx context.Context, request *dto.FieldRequest) (*dto.FieldResponse, error) {
+
+}
+
+func (f *FieldService) Update(ctx context.Context, uuid string, request *dto.UpdateFieldRequest) (*dto.FieldResponse, error) {
 	//TODO implement me
 	panic("implement me")
 }

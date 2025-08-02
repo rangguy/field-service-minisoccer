@@ -8,6 +8,8 @@ var (
 	ErrTooManyRequests     = errors.New("too many requests")
 	ErrUnauthorized        = errors.New("unauthorized")
 	ErrInvalidToken        = errors.New("invalid token")
+	ErrInvalidUploadFile   = errors.New("invalid upload file")
+	ErrSizeTooBig          = errors.New("file size too big")
 	ErrForbidden           = errors.New("forbidden")
 )
 
