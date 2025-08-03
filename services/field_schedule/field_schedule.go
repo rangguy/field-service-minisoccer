@@ -23,8 +23,8 @@ type IFieldScheduleService interface {
 	GetByUUID(context.Context, string) (*dto.FieldScheduleResponse, error)
 	GenerateScheduleForOneMonth(context.Context, *dto.GenerateFieldScheduleForOneMonthRequest) error
 	Create(context.Context, *dto.FieldScheduleRequest) error
-	Update(context.Context, string, *dto.FieldScheduleRequest) (*dto.FieldScheduleResponse, error)
-	UpdateStatus(context.Context, *dto.FieldScheduleRequest) error
+	Update(context.Context, string, *dto.UpdateFieldScheduleRequest) (*dto.FieldScheduleResponse, error)
+	UpdateStatus(ctx context.Context, request *dto.UpdateStatusFieldScheduleRequest) error
 	Delete(context.Context, string) error
 }
 
@@ -222,17 +222,80 @@ func (f *FieldScheduleService) Create(ctx context.Context, request *dto.FieldSch
 	return nil
 }
 
-func (f *FieldScheduleService) Update(ctx context.Context, s string, request *dto.FieldScheduleRequest) (*dto.FieldScheduleResponse, error) {
-	//TODO implement me
-	panic("implement me")
+func (f *FieldScheduleService) Update(ctx context.Context, uuid string, request *dto.UpdateFieldScheduleRequest) (*dto.FieldScheduleResponse, error) {
+	fieldSchedule, err := f.repository.GetFieldSchedule().FindByUUID(ctx, uuid)
+	if err != nil {
+		return nil, err
+	}
+
+	scheduleTime, err := f.repository.GetTime().FindByUUID(ctx, request.TimeID)
+	if err != nil {
+		return nil, err
+	}
+
+	isTimeExist, err := f.repository.GetFieldSchedule().FindByDateAndTimeID(ctx, request.Date, int(scheduleTime.ID), int(fieldSchedule.FieldID))
+	if err != nil {
+		return nil, err
+	}
+
+	if isTimeExist != nil && request.Date != fieldSchedule.Date.Format(time.DateOnly) {
+		checkDate, err := f.repository.GetFieldSchedule().FindByDateAndTimeID(ctx, request.Date, int(scheduleTime.ID), int(fieldSchedule.FieldID))
+		if err != nil {
+			return nil, err
+		}
+
+		if checkDate != nil {
+			return nil, errFieldSchedule.ErrFieldScheduleIsExist
+		}
+	}
+
+	dateParsed, _ := time.Parse(time.DateOnly, request.Date)
+	fieldScheduleUpdated, err := f.repository.GetFieldSchedule().Update(ctx, uuid, &models.FieldSchedule{
+		Date:   dateParsed,
+		TimeID: scheduleTime.ID,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	response := &dto.FieldScheduleResponse{
+		UUID:         fieldScheduleUpdated.UUID,
+		FieldName:    fieldScheduleUpdated.Field.Name,
+		Date:         fieldScheduleUpdated.Date.Format(time.DateOnly),
+		PricePerHour: fieldScheduleUpdated.Field.PricePerHour,
+		Status:       fieldScheduleUpdated.Status.GetStatusString(),
+		CreatedAt:    fieldScheduleUpdated.CreatedAt,
+		UpdatedAt:    fieldScheduleUpdated.UpdatedAt,
+	}
+
+	return response, nil
 }
 
-func (f *FieldScheduleService) UpdateStatus(ctx context.Context, request *dto.FieldScheduleRequest) error {
-	//TODO implement me
-	panic("implement me")
+func (f *FieldScheduleService) UpdateStatus(ctx context.Context, request *dto.UpdateStatusFieldScheduleRequest) error {
+	for _, item := range request.FieldScheduleIDs {
+		_, err := f.repository.GetFieldSchedule().FindByUUID(ctx, item)
+		if err != nil {
+			return err
+		}
+
+		err = f.repository.GetFieldSchedule().UpdateStatus(ctx, constants.Booked, item)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
-func (f *FieldScheduleService) Delete(ctx context.Context, s string) error {
-	//TODO implement me
-	panic("implement me")
+func (f *FieldScheduleService) Delete(ctx context.Context, uuid string) error {
+	_, err := f.repository.GetFieldSchedule().FindByUUID(ctx, uuid)
+	if err != nil {
+		return err
+	}
+
+	err = f.repository.GetFieldSchedule().Delete(ctx, uuid)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
