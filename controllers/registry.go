@@ -12,7 +12,7 @@ type Registry struct {
 }
 
 type IControllerRegistry interface {
-	GetFieldController() fieldController.IFieldController
+	GetField() fieldController.IFieldController
 	GetFieldSchedule() fieldScheduleController.IFieldScheduleController
 	GetTime() timeController.ITimeController
 }
@@ -21,7 +21,7 @@ func NewControllerRegistry(service services.IServiceRegistry) IControllerRegistr
 	return &Registry{service: service}
 }
 
-func (r *Registry) GetFieldController() fieldController.IFieldController {
+func (r *Registry) GetField() fieldController.IFieldController {
 	return fieldController.NewFieldController(r.service)
 }
 
