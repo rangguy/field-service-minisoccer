@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"field-service/clients"
 	"field-service/common/response"
 	"field-service/config"
 	"field-service/constants"
@@ -38,12 +39,14 @@ var command = &cobra.Command{
 		time.Local = loc
 
 		err = db.AutoMigrate(
-			&models.Role{},
-			&models.User{},
+			&models.Field{},
+			&models.FieldSchedule{},
+			&models.Time{},
 		)
 		if err != nil {
 			panic(err)
 		}
+		client := clients.NewClientRegistry()
 		repository := repositories.NewRepositoryRegistry(db)
 		service := services.NewServiceRegistry(repository)
 		controller := controllers.NewControllerRegistry(service)
@@ -78,7 +81,7 @@ var command = &cobra.Command{
 		router.Use(middlewares.RateLimiter(lmt))
 
 		group := router.Group("/api/v1")
-		route := routes.NewRouteRegistry(controller, group)
+		route := routes.NewRouteRegistry(group, controller, client)
 		route.Serve()
 
 		port := fmt.Sprintf(":%d", config.Config.Port)
