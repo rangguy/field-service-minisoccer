@@ -18,16 +18,16 @@ type IFieldScheduleRoute interface {
 	Run()
 }
 
-func NewFieldScheduleRoute(router *gin.Engine, controller controllers.IControllerRegistry, client clients.IClientRegistry) *FieldScheduleRoute {
+func NewFieldScheduleRoute(group *gin.RouterGroup, controller controllers.IControllerRegistry, client clients.IClientRegistry) *FieldScheduleRoute {
 	return &FieldScheduleRoute{
 		controller: controller,
-		group:      router.Group("/field"),
+		group:      group,
 		client:     client,
 	}
 }
 
 func (f *FieldScheduleRoute) Run() {
-	group := f.group.Group("/field_schedule")
+	group := f.group.Group("/field/schedule")
 	group.GET("", middlewares.AuthenticateWithoutToken(), f.controller.GetFieldSchedule().GetAllByFieldIDAndDate)
 	group.PATCH("", middlewares.AuthenticateWithoutToken(), f.controller.GetFieldSchedule().UpdateStatus)
 	group.Use(middlewares.Authenticate())

@@ -18,10 +18,10 @@ type IFieldRoute interface {
 	Run()
 }
 
-func NewFieldRoute(router *gin.Engine, controller controllers.IControllerRegistry, client clients.IClientRegistry) *FieldRoute {
+func NewFieldRoute(group *gin.RouterGroup, controller controllers.IControllerRegistry, client clients.IClientRegistry) *FieldRoute {
 	return &FieldRoute{
 		controller: controller,
-		group:      router.Group("/field"),
+		group:      group,
 		client:     client,
 	}
 }
