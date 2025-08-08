@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"context"
 	"crypto/sha256"
 	"encoding/hex"
 	"field-service/clients"
@@ -92,7 +93,7 @@ func contains(roles []string, role string) bool {
 
 func CheckRole(roles []string, client clients.IClientRegistry) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		user, err := client.GetUser().GetUserByToken(c)
+		user, err := client.GetUser().GetUserByToken(c.Request.Context())
 		if err != nil {
 			responseUnauthorized(c, errConstant.ErrUnauthorized.Error())
 			return
@@ -120,6 +121,10 @@ func Authenticate() gin.HandlerFunc {
 			responseUnauthorized(c, err.Error())
 			return
 		}
+
+		tokenString := extractBearerToken(token)
+		tokenUser := c.Request.WithContext(context.WithValue(c.Request.Context(), constants.Token, tokenString))
+		c.Request = tokenUser
 
 		c.Next()
 	}

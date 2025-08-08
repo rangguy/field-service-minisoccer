@@ -5,6 +5,7 @@ import (
 	"field-service/constants"
 	"field-service/controllers"
 	"field-service/middlewares"
+	"fmt"
 	"github.com/gin-gonic/gin"
 )
 
@@ -30,7 +31,9 @@ func (f *FieldRoute) Run() {
 	group := f.group.Group("/field")
 	group.GET("", middlewares.AuthenticateWithoutToken(), f.controller.GetField().GetAllWithoutPagination)
 	group.GET("/:uuid", middlewares.AuthenticateWithoutToken(), f.controller.GetField().GetByUUID)
+	fmt.Println("Gagal melewati middlewares")
 	group.Use(middlewares.Authenticate())
+	fmt.Println("Berhasil melewati middlewares")
 	group.GET("/pagination", middlewares.CheckRole(
 		[]string{
 			constants.Admin,

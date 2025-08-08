@@ -61,7 +61,7 @@ func (f *FieldService) GetAllWithPagination(ctx context.Context, param *dto.Fiel
 	}
 
 	response := util.GeneratePagination(*pagination)
-	return response, nil
+	return &response, nil
 }
 
 func (f *FieldService) GetAllWithoutPagination(ctx context.Context) ([]dto.FieldResponse, error) {
