@@ -9,6 +9,7 @@ import (
 	"field-service/domain/models"
 	"field-service/repositories"
 	"fmt"
+	uuid2 "github.com/google/uuid"
 	"io"
 	"mime/multipart"
 	"os"
@@ -45,6 +46,7 @@ func (f *FieldService) GetAllWithPagination(ctx context.Context, param *dto.Fiel
 	for _, field := range fields {
 		fieldResult = append(fieldResult, &dto.FieldResponse{
 			UUID:         field.UUID,
+			Code:         field.Code,
 			Name:         field.Name,
 			PricePerHour: field.PricePerHour,
 			Images:       field.Images,
@@ -74,6 +76,7 @@ func (f *FieldService) GetAllWithoutPagination(ctx context.Context) ([]dto.Field
 	for _, field := range fields {
 		fieldResult = append(fieldResult, dto.FieldResponse{
 			UUID:         field.UUID,
+			Code:         field.Code,
 			Name:         field.Name,
 			PricePerHour: field.PricePerHour,
 			Images:       field.Images,
@@ -91,6 +94,7 @@ func (f *FieldService) GetByUUID(ctx context.Context, uuid string) (*dto.FieldRe
 
 	fieldResult := &dto.FieldResponse{
 		UUID:         field.UUID,
+		Code:         field.Code,
 		Name:         field.Name,
 		PricePerHour: field.PricePerHour,
 		Images:       field.Images,
@@ -121,33 +125,32 @@ func (f *FieldService) processAndUploadImage(ctx context.Context, image multipar
 	}
 	defer file.Close()
 
-	// Membaca isi file ke buffer
 	buffer := new(bytes.Buffer)
 	_, err = io.Copy(buffer, file)
 	if err != nil {
 		return "", err
 	}
 
-	// Format nama file
 	timestamp := time.Now().Format("20060102150405")
 	ext := path.Ext(image.Filename)
 	newFilename := fmt.Sprintf("%s-%s%s", timestamp, strings.TrimSuffix(image.Filename, ext), ext)
 
-	// Buat path lengkap di folder "images"
-	outputPath := filepath.Join("images", newFilename)
+	// Gunakan forward slash, bukan backslash
+	outputPath := "images/" + newFilename
 
-	// Pastikan folder "images" ada
 	err = os.MkdirAll("images", os.ModePerm)
 	if err != nil {
 		return "", err
 	}
 
-	// Simpan file ke path
-	err = os.WriteFile(outputPath, buffer.Bytes(), 0644)
+	// Untuk menyimpan file tetap gunakan filepath.Join (OS-specific)
+	actualFilePath := filepath.Join("images", newFilename)
+	err = os.WriteFile(actualFilePath, buffer.Bytes(), 0644)
 	if err != nil {
 		return "", err
 	}
 
+	// Return path dengan forward slash untuk database
 	return outputPath, nil
 }
 
@@ -187,6 +190,7 @@ func (f *FieldService) Create(ctx context.Context, request *dto.FieldRequest) (*
 
 	response := &dto.FieldResponse{
 		UUID:         field.UUID,
+		Code:         field.Code,
 		Name:         field.Name,
 		PricePerHour: field.PricePerHour,
 		Images:       field.Images,
@@ -223,8 +227,10 @@ func (f *FieldService) Update(ctx context.Context, uuid string, request *dto.Upd
 		return nil, err
 	}
 
+	uuidParsed, _ := uuid2.Parse(uuid)
+
 	response := &dto.FieldResponse{
-		UUID:         fieldUpdated.UUID,
+		UUID:         uuidParsed,
 		Code:         fieldUpdated.Code,
 		Name:         fieldUpdated.Name,
 		PricePerHour: fieldUpdated.PricePerHour,
