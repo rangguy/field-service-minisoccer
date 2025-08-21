@@ -22,7 +22,7 @@ type ITimeRepository interface {
 	Create(context.Context, *models.Time) (*models.Time, error)
 }
 
-func NewTimeRepository(db *gorm.DB) *TimeRepository {
+func NewTimeRepository(db *gorm.DB) ITimeRepository {
 	return &TimeRepository{db: db}
 }
 

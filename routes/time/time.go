@@ -26,25 +26,16 @@ func NewTimeRoute(group *gin.RouterGroup, controller controllers.IControllerRegi
 	}
 }
 
-func (f *TimeRoute) Run() {
-	group := f.group.Group("/time")
+func (t *TimeRoute) Run() {
+	group := t.group.Group("/time")
 	group.Use(middlewares.Authenticate())
-	group.GET("/", middlewares.CheckRole(
-		[]string{
-			constants.Admin,
-		}, f.client),
-		f.controller.GetTime().GetAll,
-	)
-	group.GET("", middlewares.CheckRole(
-		[]string{
-			constants.Admin,
-		}, f.client),
-		f.controller.GetTime().GetByUUID,
-	)
-	group.POST("/:uuid", middlewares.CheckRole(
-		[]string{
-			constants.Admin,
-		}, f.client),
-		f.controller.GetTime().Create,
-	)
+	group.GET("", middlewares.CheckRole([]string{
+		constants.Admin,
+	}, t.client), t.controller.GetTime().GetAll)
+	group.GET("/:uuid", middlewares.CheckRole([]string{
+		constants.Admin,
+	}, t.client), t.controller.GetTime().GetByUUID)
+	group.POST("", middlewares.CheckRole([]string{
+		constants.Admin,
+	}, t.client), t.controller.GetTime().Create)
 }
