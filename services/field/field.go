@@ -32,7 +32,7 @@ type IFieldService interface {
 	Delete(context.Context, string) error
 }
 
-func NewFieldService(repository repositories.IRepositoryRegistry) *FieldService {
+func NewFieldService(repository repositories.IRepositoryRegistry) IFieldService {
 	return &FieldService{repository}
 }
 

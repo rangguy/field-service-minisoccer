@@ -25,7 +25,7 @@ type IFieldScheduleController interface {
 	GenerateScheduleForOneMonth(*gin.Context)
 }
 
-func NewFieldScheduleController(service services.IServiceRegistry) *FieldScheduleController {
+func NewFieldScheduleController(service services.IServiceRegistry) IFieldScheduleController {
 	return &FieldScheduleController{
 		service: service,
 	}

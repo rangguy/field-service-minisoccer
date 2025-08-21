@@ -20,7 +20,7 @@ type ITimeController interface {
 	Create(*gin.Context)
 }
 
-func NewTimeController(service services.IServiceRegistry) *TimeController {
+func NewTimeController(service services.IServiceRegistry) ITimeController {
 	return &TimeController{service: service}
 }
 
