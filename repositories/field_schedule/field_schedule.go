@@ -84,7 +84,7 @@ func (f *FieldScheduleRepository) FindAllByFieldIDAndDate(ctx context.Context, f
 		Where("date = ?", date).
 		Joins("LEFT JOIN times ON field_schedules.time_id = times.id").
 		Order("times.start_time asc").
-		First(&fieldSchedule).
+		Find(&fieldSchedule).
 		Error
 	if err != nil {
 		return nil, errWrap.WrapError(errConstant.ErrSQLError)
@@ -124,7 +124,7 @@ func (f *FieldScheduleRepository) FindByDateAndTimeID(ctx context.Context, date 
 		Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, errWrap.WrapError(errFieldSchedule.ErrFieldScheduleNotFound)
+			return nil, nil
 		}
 
 		return nil, errWrap.WrapError(errConstant.ErrSQLError)

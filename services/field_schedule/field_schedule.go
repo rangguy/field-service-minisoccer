@@ -91,7 +91,10 @@ func (f *FieldScheduleService) convertMonthName(inputDate string) string {
 	return formattedDate
 }
 
-func (f *FieldScheduleService) GetAllByFieldIDAndDate(ctx context.Context, uuid, date string) ([]dto.FieldScheduleForBookingResponse, error) {
+func (f *FieldScheduleService) GetAllByFieldIDAndDate(
+	ctx context.Context,
+	uuid, date string,
+) ([]dto.FieldScheduleForBookingResponse, error) {
 	field, err := f.repository.GetField().FindByUUID(ctx, uuid)
 	if err != nil {
 		return nil, err
@@ -103,14 +106,16 @@ func (f *FieldScheduleService) GetAllByFieldIDAndDate(ctx context.Context, uuid,
 	}
 
 	fieldScheduleResults := make([]dto.FieldScheduleForBookingResponse, 0, len(fieldSchedules))
-	for _, schedule := range fieldSchedules {
-		pricePerHour := float64(schedule.Field.PricePerHour)
+	for _, fieldSchedule := range fieldSchedules {
+		pricePerHour := float64(fieldSchedule.Field.PricePerHour)
+		startTime, _ := time.Parse("15:04:05", fieldSchedule.Time.StartTime)
+		endTime, _ := time.Parse("15:04:05", fieldSchedule.Time.EndTime)
 		fieldScheduleResults = append(fieldScheduleResults, dto.FieldScheduleForBookingResponse{
-			UUID:         schedule.UUID,
-			Date:         f.convertMonthName(schedule.Date.Format(time.DateOnly)),
-			Time:         schedule.Time.StartTime,
-			Status:       schedule.Status.GetStatusString(),
+			UUID:         fieldSchedule.UUID,
 			PricePerHour: util.RupiahFormat(&pricePerHour),
+			Date:         f.convertMonthName(fieldSchedule.Date.Format("2006-01-02")),
+			Status:       fieldSchedule.Status.GetStatusString(),
+			Time:         fmt.Sprintf("%s - %s", startTime.Format("15:04"), endTime.Format("15:04")),
 		})
 	}
 
@@ -129,6 +134,7 @@ func (f *FieldScheduleService) GetByUUID(ctx context.Context, uuid string) (*dto
 		PricePerHour: fieldSchedule.Field.PricePerHour,
 		Date:         fieldSchedule.Date.Format(time.DateOnly),
 		Status:       fieldSchedule.Status.GetStatusString(),
+		Time:         fmt.Sprintf("%s - %s", fieldSchedule.Time.StartTime, fieldSchedule.Time.EndTime),
 		CreatedAt:    fieldSchedule.CreatedAt,
 		UpdatedAt:    fieldSchedule.UpdatedAt,
 	}
@@ -264,6 +270,7 @@ func (f *FieldScheduleService) Update(ctx context.Context, uuid string, request 
 		Date:         fieldScheduleUpdated.Date.Format(time.DateOnly),
 		PricePerHour: fieldScheduleUpdated.Field.PricePerHour,
 		Status:       fieldScheduleUpdated.Status.GetStatusString(),
+		Time:         fmt.Sprintf("%s - %s", scheduleTime.StartTime, scheduleTime.EndTime),
 		CreatedAt:    fieldScheduleUpdated.CreatedAt,
 		UpdatedAt:    fieldScheduleUpdated.UpdatedAt,
 	}

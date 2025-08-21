@@ -120,7 +120,7 @@ func (f *FieldScheduleController) GetAllByFieldIDAndDate(context *gin.Context) {
 }
 
 func (f *FieldScheduleController) GetByUUID(context *gin.Context) {
-	result, err := f.service.GetFieldSchedule().GetByUUID(context, context.Param("id"))
+	result, err := f.service.GetFieldSchedule().GetByUUID(context, context.Param("uuid"))
 	if err != nil {
 		response.HttpResponse(response.ParamHTTPResp{
 			Code: http.StatusBadRequest,
