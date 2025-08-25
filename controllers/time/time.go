@@ -24,13 +24,13 @@ func NewTimeController(service services.IServiceRegistry) ITimeController {
 	return &TimeController{service: service}
 }
 
-func (t *TimeController) GetAll(context *gin.Context) {
-	result, err := t.service.GetTime().GetAll(context)
+func (t *TimeController) GetAll(ctx *gin.Context) {
+	result, err := t.service.GetTime().GetAll(ctx)
 	if err != nil {
 		response.HttpResponse(response.ParamHTTPResp{
 			Code: http.StatusBadRequest,
 			Err:  err,
-			Gin:  context,
+			Gin:  ctx,
 		})
 		return
 	}
@@ -38,18 +38,18 @@ func (t *TimeController) GetAll(context *gin.Context) {
 	response.HttpResponse(response.ParamHTTPResp{
 		Code: http.StatusOK,
 		Data: result,
-		Gin:  context,
+		Gin:  ctx,
 	})
 }
 
-func (t *TimeController) GetByUUID(context *gin.Context) {
-	uuid := context.Param("uuid")
-	result, err := t.service.GetTime().GetByUUID(context, uuid)
+func (t *TimeController) GetByUUID(ctx *gin.Context) {
+	uuid := ctx.Param("uuid")
+	result, err := t.service.GetTime().GetByUUID(ctx, uuid)
 	if err != nil {
 		response.HttpResponse(response.ParamHTTPResp{
 			Code: http.StatusBadRequest,
 			Err:  err,
-			Gin:  context,
+			Gin:  ctx,
 		})
 		return
 	}
@@ -57,18 +57,18 @@ func (t *TimeController) GetByUUID(context *gin.Context) {
 	response.HttpResponse(response.ParamHTTPResp{
 		Code: http.StatusOK,
 		Data: result,
-		Gin:  context,
+		Gin:  ctx,
 	})
 }
 
-func (t *TimeController) Create(context *gin.Context) {
+func (t *TimeController) Create(ctx *gin.Context) {
 	var request dto.TimeRequest
-	err := context.ShouldBind(&request)
+	err := ctx.ShouldBind(&request)
 	if err != nil {
 		response.HttpResponse(response.ParamHTTPResp{
 			Code: http.StatusBadRequest,
 			Err:  err,
-			Gin:  context,
+			Gin:  ctx,
 		})
 		return
 	}
@@ -83,17 +83,17 @@ func (t *TimeController) Create(context *gin.Context) {
 			Err:     err,
 			Message: &errMessage,
 			Data:    errorResponse,
-			Gin:     context,
+			Gin:     ctx,
 		})
 		return
 	}
 
-	result, err := t.service.GetTime().Create(context, &request)
+	result, err := t.service.GetTime().Create(ctx, &request)
 	if err != nil {
 		response.HttpResponse(response.ParamHTTPResp{
 			Code: http.StatusBadRequest,
 			Err:  err,
-			Gin:  context,
+			Gin:  ctx,
 		})
 		return
 	}
@@ -101,6 +101,6 @@ func (t *TimeController) Create(context *gin.Context) {
 	response.HttpResponse(response.ParamHTTPResp{
 		Code: http.StatusCreated,
 		Data: result,
-		Gin:  context,
+		Gin:  ctx,
 	})
 }

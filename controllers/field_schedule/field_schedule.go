@@ -31,13 +31,13 @@ func NewFieldScheduleController(service services.IServiceRegistry) IFieldSchedul
 	}
 }
 
-func (f *FieldScheduleController) GetAllWithPagination(context *gin.Context) {
+func (f *FieldScheduleController) GetAllWithPagination(ctx *gin.Context) {
 	var params dto.FieldScheduleRequestParam
-	if err := context.ShouldBindQuery(&params); err != nil {
+	if err := ctx.ShouldBindQuery(&params); err != nil {
 		response.HttpResponse(response.ParamHTTPResp{
 			Code: http.StatusBadRequest,
 			Err:  err,
-			Gin:  context,
+			Gin:  ctx,
 		})
 		return
 	}
@@ -53,17 +53,17 @@ func (f *FieldScheduleController) GetAllWithPagination(context *gin.Context) {
 			Err:     err,
 			Message: &errMessage,
 			Data:    errorResponse,
-			Gin:     context,
+			Gin:     ctx,
 		})
 		return
 	}
 
-	result, err := f.service.GetFieldSchedule().GetAllWithPagination(context, &params)
+	result, err := f.service.GetFieldSchedule().GetAllWithPagination(ctx, &params)
 	if err != nil {
 		response.HttpResponse(response.ParamHTTPResp{
 			Code: http.StatusBadRequest,
 			Err:  err,
-			Gin:  context,
+			Gin:  ctx,
 		})
 		return
 	}
@@ -71,17 +71,17 @@ func (f *FieldScheduleController) GetAllWithPagination(context *gin.Context) {
 	response.HttpResponse(response.ParamHTTPResp{
 		Code: http.StatusOK,
 		Data: result,
-		Gin:  context,
+		Gin:  ctx,
 	})
 }
 
-func (f *FieldScheduleController) GetAllByFieldIDAndDate(context *gin.Context) {
+func (f *FieldScheduleController) GetAllByFieldIDAndDate(ctx *gin.Context) {
 	var params dto.FieldScheduleByFieldIDAndDateRequestParam
-	if err := context.ShouldBindQuery(&params); err != nil {
+	if err := ctx.ShouldBindQuery(&params); err != nil {
 		response.HttpResponse(response.ParamHTTPResp{
 			Code: http.StatusBadRequest,
 			Err:  err,
-			Gin:  context,
+			Gin:  ctx,
 		})
 		return
 	}
@@ -97,17 +97,17 @@ func (f *FieldScheduleController) GetAllByFieldIDAndDate(context *gin.Context) {
 			Err:     err,
 			Message: &errMessage,
 			Data:    errorResponse,
-			Gin:     context,
+			Gin:     ctx,
 		})
 		return
 	}
 
-	result, err := f.service.GetFieldSchedule().GetAllByFieldIDAndDate(context, context.Param("uuid"), params.Date)
+	result, err := f.service.GetFieldSchedule().GetAllByFieldIDAndDate(ctx, ctx.Param("uuid"), params.Date)
 	if err != nil {
 		response.HttpResponse(response.ParamHTTPResp{
 			Code: http.StatusBadRequest,
 			Err:  err,
-			Gin:  context,
+			Gin:  ctx,
 		})
 		return
 	}
@@ -115,17 +115,17 @@ func (f *FieldScheduleController) GetAllByFieldIDAndDate(context *gin.Context) {
 	response.HttpResponse(response.ParamHTTPResp{
 		Code: http.StatusOK,
 		Data: result,
-		Gin:  context,
+		Gin:  ctx,
 	})
 }
 
-func (f *FieldScheduleController) GetByUUID(context *gin.Context) {
-	result, err := f.service.GetFieldSchedule().GetByUUID(context, context.Param("uuid"))
+func (f *FieldScheduleController) GetByUUID(ctx *gin.Context) {
+	result, err := f.service.GetFieldSchedule().GetByUUID(ctx, ctx.Param("uuid"))
 	if err != nil {
 		response.HttpResponse(response.ParamHTTPResp{
 			Code: http.StatusBadRequest,
 			Err:  err,
-			Gin:  context,
+			Gin:  ctx,
 		})
 		return
 	}
@@ -133,18 +133,18 @@ func (f *FieldScheduleController) GetByUUID(context *gin.Context) {
 	response.HttpResponse(response.ParamHTTPResp{
 		Code: http.StatusOK,
 		Data: result,
-		Gin:  context,
+		Gin:  ctx,
 	})
 }
 
-func (f *FieldScheduleController) Create(context *gin.Context) {
+func (f *FieldScheduleController) Create(ctx *gin.Context) {
 	var params dto.FieldScheduleRequest
-	err := context.ShouldBindJSON(&params)
+	err := ctx.ShouldBindJSON(&params)
 	if err != nil {
 		response.HttpResponse(response.ParamHTTPResp{
 			Code: http.StatusBadRequest,
 			Err:  err,
-			Gin:  context,
+			Gin:  ctx,
 		})
 		return
 	}
@@ -159,35 +159,35 @@ func (f *FieldScheduleController) Create(context *gin.Context) {
 			Err:     err,
 			Message: &errMessage,
 			Data:    errorResponse,
-			Gin:     context,
+			Gin:     ctx,
 		})
 		return
 	}
 
-	err = f.service.GetFieldSchedule().Create(context, &params)
+	err = f.service.GetFieldSchedule().Create(ctx, &params)
 	if err != nil {
 		response.HttpResponse(response.ParamHTTPResp{
 			Code: http.StatusBadRequest,
 			Err:  err,
-			Gin:  context,
+			Gin:  ctx,
 		})
 		return
 	}
 
 	response.HttpResponse(response.ParamHTTPResp{
 		Code: http.StatusCreated,
-		Gin:  context,
+		Gin:  ctx,
 	})
 }
 
-func (f *FieldScheduleController) Update(context *gin.Context) {
+func (f *FieldScheduleController) Update(ctx *gin.Context) {
 	var params dto.UpdateFieldScheduleRequest
-	err := context.ShouldBindJSON(&params)
+	err := ctx.ShouldBindJSON(&params)
 	if err != nil {
 		response.HttpResponse(response.ParamHTTPResp{
 			Code: http.StatusBadRequest,
 			Err:  err,
-			Gin:  context,
+			Gin:  ctx,
 		})
 		return
 	}
@@ -202,17 +202,17 @@ func (f *FieldScheduleController) Update(context *gin.Context) {
 			Err:     err,
 			Message: &errMessage,
 			Data:    errorResponse,
-			Gin:     context,
+			Gin:     ctx,
 		})
 		return
 	}
 
-	result, err := f.service.GetFieldSchedule().Update(context, context.Param("uuid"), &params)
+	result, err := f.service.GetFieldSchedule().Update(ctx, ctx.Param("uuid"), &params)
 	if err != nil {
 		response.HttpResponse(response.ParamHTTPResp{
 			Code: http.StatusBadRequest,
 			Err:  err,
-			Gin:  context,
+			Gin:  ctx,
 		})
 		return
 	}
@@ -220,18 +220,18 @@ func (f *FieldScheduleController) Update(context *gin.Context) {
 	response.HttpResponse(response.ParamHTTPResp{
 		Code: http.StatusOK,
 		Data: result,
-		Gin:  context,
+		Gin:  ctx,
 	})
 }
 
-func (f *FieldScheduleController) UpdateStatus(context *gin.Context) {
+func (f *FieldScheduleController) UpdateStatus(ctx *gin.Context) {
 	var request dto.UpdateStatusFieldScheduleRequest
-	err := context.ShouldBindJSON(&request)
+	err := ctx.ShouldBindJSON(&request)
 	if err != nil {
 		response.HttpResponse(response.ParamHTTPResp{
 			Code: http.StatusBadRequest,
 			Err:  err,
-			Gin:  context,
+			Gin:  ctx,
 		})
 		return
 	}
@@ -246,52 +246,52 @@ func (f *FieldScheduleController) UpdateStatus(context *gin.Context) {
 			Err:     err,
 			Message: &errMessage,
 			Data:    errorResponse,
-			Gin:     context,
+			Gin:     ctx,
 		})
 		return
 	}
 
-	err = f.service.GetFieldSchedule().UpdateStatus(context, &request)
+	err = f.service.GetFieldSchedule().UpdateStatus(ctx, &request)
 	if err != nil {
 		response.HttpResponse(response.ParamHTTPResp{
 			Code: http.StatusBadRequest,
 			Err:  err,
-			Gin:  context,
+			Gin:  ctx,
 		})
 		return
 	}
 
 	response.HttpResponse(response.ParamHTTPResp{
 		Code: http.StatusOK,
-		Gin:  context,
+		Gin:  ctx,
 	})
 }
 
-func (f *FieldScheduleController) Delete(context *gin.Context) {
-	err := f.service.GetFieldSchedule().Delete(context, context.Param("uuid"))
+func (f *FieldScheduleController) Delete(ctx *gin.Context) {
+	err := f.service.GetFieldSchedule().Delete(ctx, ctx.Param("uuid"))
 	if err != nil {
 		response.HttpResponse(response.ParamHTTPResp{
 			Code: http.StatusBadRequest,
 			Err:  err,
-			Gin:  context,
+			Gin:  ctx,
 		})
 		return
 	}
 
 	response.HttpResponse(response.ParamHTTPResp{
 		Code: http.StatusOK,
-		Gin:  context,
+		Gin:  ctx,
 	})
 }
 
-func (f *FieldScheduleController) GenerateScheduleForOneMonth(context *gin.Context) {
+func (f *FieldScheduleController) GenerateScheduleForOneMonth(ctx *gin.Context) {
 	var params dto.GenerateFieldScheduleForOneMonthRequest
-	err := context.ShouldBindJSON(&params)
+	err := ctx.ShouldBindJSON(&params)
 	if err != nil {
 		response.HttpResponse(response.ParamHTTPResp{
 			Code: http.StatusBadRequest,
 			Err:  err,
-			Gin:  context,
+			Gin:  ctx,
 		})
 		return
 	}
@@ -306,23 +306,23 @@ func (f *FieldScheduleController) GenerateScheduleForOneMonth(context *gin.Conte
 			Err:     err,
 			Message: &errMessage,
 			Data:    errorResponse,
-			Gin:     context,
+			Gin:     ctx,
 		})
 		return
 	}
 
-	err = f.service.GetFieldSchedule().GenerateScheduleForOneMonth(context, &params)
+	err = f.service.GetFieldSchedule().GenerateScheduleForOneMonth(ctx, &params)
 	if err != nil {
 		response.HttpResponse(response.ParamHTTPResp{
 			Code: http.StatusBadRequest,
 			Err:  err,
-			Gin:  context,
+			Gin:  ctx,
 		})
 		return
 	}
 
 	response.HttpResponse(response.ParamHTTPResp{
 		Code: http.StatusCreated,
-		Gin:  context,
+		Gin:  ctx,
 	})
 }

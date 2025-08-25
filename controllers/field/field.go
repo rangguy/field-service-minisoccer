@@ -28,13 +28,13 @@ func NewFieldController(service fieldService.IServiceRegistry) IFieldController 
 	return &FieldController{service: service}
 }
 
-func (f *FieldController) GetAllWithPagination(context *gin.Context) {
+func (f *FieldController) GetAllWithPagination(ctx *gin.Context) {
 	var params dto.FieldRequestParam
-	if err := context.ShouldBindQuery(&params); err != nil {
+	if err := ctx.ShouldBindQuery(&params); err != nil {
 		response.HttpResponse(response.ParamHTTPResp{
 			Code: http.StatusBadRequest,
 			Err:  err,
-			Gin:  context,
+			Gin:  ctx,
 		})
 		return
 	}
@@ -50,17 +50,17 @@ func (f *FieldController) GetAllWithPagination(context *gin.Context) {
 			Err:     err,
 			Message: &errMessage,
 			Data:    errorResponse,
-			Gin:     context,
+			Gin:     ctx,
 		})
 		return
 	}
 
-	result, err := f.service.GetField().GetAllWithPagination(context, &params)
+	result, err := f.service.GetField().GetAllWithPagination(ctx, &params)
 	if err != nil {
 		response.HttpResponse(response.ParamHTTPResp{
 			Code: http.StatusBadRequest,
 			Err:  err,
-			Gin:  context,
+			Gin:  ctx,
 		})
 		return
 	}
@@ -68,17 +68,17 @@ func (f *FieldController) GetAllWithPagination(context *gin.Context) {
 	response.HttpResponse(response.ParamHTTPResp{
 		Code: http.StatusOK,
 		Data: result,
-		Gin:  context,
+		Gin:  ctx,
 	})
 }
 
-func (f *FieldController) GetAllWithoutPagination(context *gin.Context) {
-	result, err := f.service.GetField().GetAllWithoutPagination(context)
+func (f *FieldController) GetAllWithoutPagination(ctx *gin.Context) {
+	result, err := f.service.GetField().GetAllWithoutPagination(ctx)
 	if err != nil {
 		response.HttpResponse(response.ParamHTTPResp{
 			Code: http.StatusBadRequest,
 			Err:  err,
-			Gin:  context,
+			Gin:  ctx,
 		})
 		return
 	}
@@ -86,17 +86,17 @@ func (f *FieldController) GetAllWithoutPagination(context *gin.Context) {
 	response.HttpResponse(response.ParamHTTPResp{
 		Code: http.StatusOK,
 		Data: result,
-		Gin:  context,
+		Gin:  ctx,
 	})
 }
 
-func (f *FieldController) GetByUUID(context *gin.Context) {
-	result, err := f.service.GetField().GetByUUID(context, context.Param("uuid"))
+func (f *FieldController) GetByUUID(ctx *gin.Context) {
+	result, err := f.service.GetField().GetByUUID(ctx, ctx.Param("uuid"))
 	if err != nil {
 		response.HttpResponse(response.ParamHTTPResp{
 			Code: http.StatusBadRequest,
 			Err:  err,
-			Gin:  context,
+			Gin:  ctx,
 		})
 		return
 	}
@@ -104,17 +104,17 @@ func (f *FieldController) GetByUUID(context *gin.Context) {
 	response.HttpResponse(response.ParamHTTPResp{
 		Code: http.StatusOK,
 		Data: result,
-		Gin:  context,
+		Gin:  ctx,
 	})
 }
 
-func (f *FieldController) Create(context *gin.Context) {
+func (f *FieldController) Create(ctx *gin.Context) {
 	var request dto.FieldRequest
-	if err := context.ShouldBindWith(&request, binding.FormMultipart); err != nil {
+	if err := ctx.ShouldBindWith(&request, binding.FormMultipart); err != nil {
 		response.HttpResponse(response.ParamHTTPResp{
 			Code: http.StatusBadRequest,
 			Err:  err,
-			Gin:  context,
+			Gin:  ctx,
 		})
 		return
 	}
@@ -130,17 +130,17 @@ func (f *FieldController) Create(context *gin.Context) {
 			Err:     err,
 			Message: &errMessage,
 			Data:    errorResponse,
-			Gin:     context,
+			Gin:     ctx,
 		})
 		return
 	}
 
-	result, err := f.service.GetField().Create(context, &request)
+	result, err := f.service.GetField().Create(ctx, &request)
 	if err != nil {
 		response.HttpResponse(response.ParamHTTPResp{
 			Code: http.StatusBadRequest,
 			Err:  err,
-			Gin:  context,
+			Gin:  ctx,
 		})
 		return
 	}
@@ -148,17 +148,17 @@ func (f *FieldController) Create(context *gin.Context) {
 	response.HttpResponse(response.ParamHTTPResp{
 		Code: http.StatusOK,
 		Data: result,
-		Gin:  context,
+		Gin:  ctx,
 	})
 }
 
-func (f *FieldController) Update(context *gin.Context) {
+func (f *FieldController) Update(ctx *gin.Context) {
 	var request dto.UpdateFieldRequest
-	if err := context.ShouldBindWith(&request, binding.FormMultipart); err != nil {
+	if err := ctx.ShouldBindWith(&request, binding.FormMultipart); err != nil {
 		response.HttpResponse(response.ParamHTTPResp{
 			Code: http.StatusBadRequest,
 			Err:  err,
-			Gin:  context,
+			Gin:  ctx,
 		})
 		return
 	}
@@ -174,17 +174,17 @@ func (f *FieldController) Update(context *gin.Context) {
 			Err:     err,
 			Message: &errMessage,
 			Data:    errorResponse,
-			Gin:     context,
+			Gin:     ctx,
 		})
 		return
 	}
 
-	result, err := f.service.GetField().Update(context, context.Param("uuid"), &request)
+	result, err := f.service.GetField().Update(ctx, ctx.Param("uuid"), &request)
 	if err != nil {
 		response.HttpResponse(response.ParamHTTPResp{
 			Code: http.StatusBadRequest,
 			Err:  err,
-			Gin:  context,
+			Gin:  ctx,
 		})
 		return
 	}
@@ -192,23 +192,23 @@ func (f *FieldController) Update(context *gin.Context) {
 	response.HttpResponse(response.ParamHTTPResp{
 		Code: http.StatusOK,
 		Data: result,
-		Gin:  context,
+		Gin:  ctx,
 	})
 }
 
-func (f *FieldController) Delete(context *gin.Context) {
-	err := f.service.GetField().Delete(context, context.Param("uuid"))
+func (f *FieldController) Delete(ctx *gin.Context) {
+	err := f.service.GetField().Delete(ctx, ctx.Param("uuid"))
 	if err != nil {
 		response.HttpResponse(response.ParamHTTPResp{
 			Code: http.StatusBadRequest,
 			Err:  err,
-			Gin:  context,
+			Gin:  ctx,
 		})
 		return
 	}
 
 	response.HttpResponse(response.ParamHTTPResp{
 		Code: http.StatusOK,
-		Gin:  context,
+		Gin:  ctx,
 	})
 }
