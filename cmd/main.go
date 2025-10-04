@@ -52,6 +52,8 @@ var command = &cobra.Command{
 		controller := controllers.NewControllerRegistry(service)
 
 		router := gin.Default()
+		imagesDir := "./images"
+		router.Static("/images", imagesDir)
 		router.Use(middlewares.HandlePanic())
 		router.NoRoute(func(c *gin.Context) {
 			c.JSON(http.StatusNotFound, response.Response{
